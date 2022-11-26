@@ -24,5 +24,19 @@ or
 
 `anchor test`
 
+# See solana address
 
+`solana address`
+
+# Solana "Faucet"
+
+`solana airdrop <amount_of_solana> --url devnet`
+
+##
+
+
+`mkdir ~/my-solana-wallet`
+`solana-keygen new --outfile ~/my-solana-wallet/my-keypair.json` 
+
+Bmud467xMJhyF6fs2LTBbxWXC6Cx1YSf3tsTXev9QcEG
 
