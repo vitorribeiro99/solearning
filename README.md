@@ -38,5 +38,5 @@ or
 `mkdir ~/my-solana-wallet`
 `solana-keygen new --outfile ~/my-solana-wallet/my-keypair.json` 
 
-Bmud467xMJhyF6fs2LTBbxWXC6Cx1YSf3tsTXev9QcEG
+7ZNvX9nrvM5rAU2xNqkQRaM4HEHSQmjLnUQqKgQnE9T8 -> pubkey
 
