@@ -10,12 +10,25 @@ const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 const ActorTypeOptions = ['Author', 'Organization', 'University', 'Reviewer??'];
 
+const UserProfile = () => {
+	
+	console.log("ola");
+	return (<div></div>);
+
+};
+
 const App = () => {
 
 	const [walletAddress, setWalletAddres] = useState(null);
-	const [walletType, setWalletType] = useState(null);
 	const [selectedActorType, setSelectedActorType] = useState(null);
 	const [actorTypeConfirmed, setActorTypeConfirmed] = useState(false);
+	
+	const [showSignUpContainer, setShowSignUpContainer] = useState(false);
+	const [isSignUpClicked, setIsSignUpClicked] = useState(false);
+
+	const [showSignInContainer, setShowSignInContainer] = useState(false);
+	const [isSignInClicked, setIsSignInClicked] = useState(false);
+
 
 	useEffect(() => {
 		const actorType = localStorage.getItem("actorType");
@@ -25,36 +38,59 @@ const App = () => {
 		}
 	}, []);
 
+	const handleSignUp = () => {
+		setShowSignUpContainer(true);
+		setIsSignUpClicked(true);
+	  }
+	
+	  const handleSignIn = () => {
+		setShowSignInContainer(true);
+		setIsSignInClicked(true);
+	  }
+
 	const handleChange = event => {
 		setSelectedActorType(event.target.value);
 	  };
 
 	const handleConfirm = () => {
-		// Perform actions to confirm actor type selection, such as storing the actor type in the wallet's metadata
 		setActorTypeConfirmed(true);
-		localStorage.setItem("actorType", selectedActorType);
+		console.log("You select -> Actor Type:" , localStorage.getItem("actorType"), "actorTypeConfirmed:", localStorage.getItem("actorTypeConfirmed"));
 	};
 
+	const handleProfile = () => {
+					const userInfo = JSON.parse(localStorage.getItem(`userInfo-${walletAddress}`));
+					console.log("UserInfo:", userInfo)
+	}
+
+	const handleLogout = () => {
+		setWalletAddres(null);
+		setIsSignUpClicked(false);
+		setIsSignInClicked(false);
+		const { solana } = window;
+		if (solana) {
+		  solana.disconnect();
+		}
+	};
 	const checkIfWalletIsConnected = async () => {
 		try {
 			const { solana } = window;
-			if (selectedActorType && actorTypeConfirmed) {
 			if (solana) {
 				if (solana.isPhantom) {
-					console.log("Phantom wallet found!");
-					const response = await solana.connect({
-						onlyIfTrusted: true,
-					});
-					console.log(
-						"Connected with public key:",
-						response.publicKey.toString()
-					);
-					setWalletAddres(response.publicKey.toString())
-					setWalletType(selectedActorType.toString())}
+					// const response = await solana.connect({
+					// 	onlyIfTrusted: true,
+					// });
+					// console.log("Phantom wallet found with the address:",
+					// 	response.publicKey.toString(),
+					// );
+					// setWalletAddres(response.publicKey.toString())
+					// const userwallet = response.publicKey.toString();
+					// const userInfo = JSON.parse(localStorage.getItem(`userInfo-${userwallet}`));
+					// console.log("UserInfo:", userInfo)
 				}
-			} else {
+				}
+			 else {
 				alert("Solana object not found! Get a Phantom wallet");
-			}
+			}	
 		} catch (error) {
 			console.error(error);
 		}
@@ -65,14 +101,23 @@ const App = () => {
 			const response = await solana.connect();
 			console.log(
 				"Connected with public key:",
-				response.publicKey.toString(), selectedActorType.toString()
+				response.publicKey.toString()
 			);
 			setWalletAddres(response.publicKey.toString())
-			setWalletType(selectedActorType.toString())
+			const userInfo = {
+				walletAddress: response.publicKey.toString(),
+				actorType: selectedActorType,
+				TypeConfirmed: actorTypeConfirmed
+			  }
+			  localStorage.setItem(`userInfo-${response.publicKey.toString()}`, JSON.stringify(userInfo));
+			  setShowSignUpContainer(false);
+			  setShowSignInContainer(false);
+			  setIsSignUpClicked(true);
+			  setIsSignInClicked(true);
 		}
 	};
 
-	const renderNotConnectedContainer = () => (
+	const renderSignUpContainer = () => (
 		<div>
 		<p>Your Solana Phantom wallet is not connected. Please select your actor type and connect your wallet to continue.</p>
 		<label>Select actor type:</label>
@@ -84,14 +129,21 @@ const App = () => {
 					</option>
 				))}
 			</select>
-			{!actorTypeConfirmed && ( // Only render the "Confirm actor type" button if the actor type has not been confirmed
-				<button onClick={connectWallet} disabled={!selectedActorType}>Confirm actor type</button>
-				)}
-			</div>
-	)
+		<div><button className="cta-button2 connect-wallet-button" onClick={handleConfirm} disabled={!selectedActorType}>Confirm your profile</button>				
+		</div> 
+		
+		<button className="cta-button connect-wallet-button" onClick={connectWallet} disabled={!actorTypeConfirmed}>Connect wallet</button>
+		</div> )
+
+const renderSignInContainer = () => (
+	<div>
+	<button className="cta-button connect-wallet-button" onClick={connectWallet} disabled={!actorTypeConfirmed}>Connect wallet</button>
+	</div> 
+)
 
 	useEffect(() => {
 		const onLoad = async() => {
+			setIsSignUpClicked(false);
 			await checkIfWalletIsConnected()
 		}
 		window.addEventListener('load', onLoad);
@@ -99,15 +151,32 @@ const App = () => {
 	}, [])
 	return (
 		<div className="App">
+			
 			<div className="container">
-				<div className="header-container">
-				<img src={logo} width={300} height={300} />
-					<p className="header">PubLed - Decentralizing Scientific Publishing</p>
-					<p className="sub-text">Research Objects as Non-Fungible Tokens(NFTs)</p>
-					
-				{!walletAddress && renderNotConnectedContainer()}
+				<div className="division-bar">	
+				<hr />
+				<nav class="navbar">
+				<div class="navbar-left">
+					<img src={logo} width={190} height={50}/>
+					<div><hr /></div>
 				</div>
-				{walletAddress && (<CandyMachine walletAddress={window.solana} />)}
+				<div class="navbar-left">
+					{walletAddress && <button className="logout-button" onClick={handleLogout}>Logout</button>}
+					{walletAddress && <button className="logout-button" onClick={handleProfile}>Profile</button>}
+					
+				</div>
+				</nav>
+					<p className="header">PubL3d - Decentralizing Scientific Publishing</p>
+					<div><hr /></div>
+					<p className="sub-text">Bringing Science from "Web0" to Web3</p>
+						<div>
+							{!walletAddress && !isSignUpClicked && !isSignInClicked && <button className="cta-button" onClick={handleSignUp}>Sign Up</button>}
+							{showSignUpContainer && renderSignUpContainer()}
+							{!walletAddress && !isSignUpClicked && !isSignInClicked && <button className="cta-button" onClick={handleSignIn}>Sign In</button>}
+							{showSignInContainer && renderSignInContainer()}
+						</div>
+				</div>
+				{walletAddress && <UserProfile/> && (<CandyMachine walletAddress={window.solana} />)}
 				<div className="footer-container">
 					<img
 						alt="Twitter Logo"
@@ -125,5 +194,6 @@ const App = () => {
 		</div>
 	);
 };
+
 
 export default App;

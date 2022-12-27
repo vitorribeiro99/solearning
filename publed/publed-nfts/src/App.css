@@ -47,7 +47,7 @@
 
 .cta-button {
   height: 45px;
-  border: 0;
+  border: 1;
   width: auto;
   padding-left: 40px;
   padding-right: 40px;
@@ -59,7 +59,7 @@
 
 .cta-button2 {
   height: 43px;
-  border: 0;
+  border: 1;
   width: 210px;
   padding-left: 39px;
   padding-right: 39px;
@@ -67,6 +67,41 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: bold;
+}
+
+.logout-button {
+  top: 0;
+  right: 0;
+  width: auto;
+  height: 30px;
+  font-size: 13px;
+  font-weight: bold;
+  margin-left: 10px;
+  cursor: pointer;
+  padding-left: 40px;
+  padding-right: 40px;
+  border-radius: 10px;
+  float: right;
+}
+
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.navbar-left {
+  float: left;
+}
+
+.navbar-right {
+  float: right;
+  right: 0;
 }
 
 .connect-wallet-button {
