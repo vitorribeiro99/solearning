@@ -29,6 +29,8 @@ const App = () => {
 	const [showSignInContainer, setShowSignInContainer] = useState(false);
 	const [isSignInClicked, setIsSignInClicked] = useState(false);
 
+	const [isRegisted, setIsRegisted] = useState(false);
+
 
 	useEffect(() => {
 		const actorType = localStorage.getItem("actorType");
@@ -53,13 +55,27 @@ const App = () => {
 	  };
 
 	const handleConfirm = () => {
-		setActorTypeConfirmed(true);
-		console.log("You select -> Actor Type:" , localStorage.getItem("actorType"), "actorTypeConfirmed:", localStorage.getItem("actorTypeConfirmed"));
+		const userInfa = JSON.parse(localStorage.getItem(`userInfo-AARYw58j8T7ZBSxWD7egje5L1pJo6tVMMrwWuXWafPNr`));
+		if (userInfa.Registed){
+		alert("Already registered");
+		setWalletAddres(null);
+		setIsSignUpClicked(false);
+		setIsSignInClicked(false);
+		setShowSignInContainer(false);
+		setShowSignUpContainer(false);
+		const { solana } = window;
+		if (solana) {
+		  solana.disconnect();
+		}
+		}
+		else{
+			setActorTypeConfirmed(true);
+		}
 	};
 
 	const handleProfile = () => {
-					const userInfo = JSON.parse(localStorage.getItem(`userInfo-${walletAddress}`));
-					console.log("UserInfo:", userInfo)
+					// const userInfo = JSON.parse(localStorage.getItem(`userInfo-${walletAddress}`));
+					// console.log("UserInfo:", userInfo)
 	}
 
 	const handleLogout = () => {
@@ -95,6 +111,38 @@ const App = () => {
 			console.error(error);
 		}
 	};
+
+	const connectFirstWallet = async () => {
+		
+		const { solana } = window;
+
+			if (solana) {
+				const response = await solana.connect();
+				console.log(
+					"Connected with public key:",
+					response.publicKey.toString()
+				);
+				const wallet = response.publicKey.toString();
+				setWalletAddres(wallet)
+				setIsRegisted(true);
+				console.log("Address:", wallet);
+	
+				const userInfo = {
+					aalletAddress: response.publicKey.toString(),
+					actorType: selectedActorType,
+					TypeConfirmed: actorTypeConfirmed,
+					Registed: isRegisted
+				  }
+				  localStorage.setItem(`userInfo-${response.publicKey.toString()}`, JSON.stringify(userInfo));
+				  setShowSignUpContainer(false);
+				  setShowSignInContainer(false);
+				  setIsSignUpClicked(true);
+				  setIsSignInClicked(true);
+				  
+			}
+		
+	};
+
 	const connectWallet = async () => {
 		const { solana } = window;
 		if (solana) {
@@ -103,13 +151,9 @@ const App = () => {
 				"Connected with public key:",
 				response.publicKey.toString()
 			);
-			setWalletAddres(response.publicKey.toString())
-			const userInfo = {
-				walletAddress: response.publicKey.toString(),
-				actorType: selectedActorType,
-				TypeConfirmed: actorTypeConfirmed
-			  }
-			  localStorage.setItem(`userInfo-${response.publicKey.toString()}`, JSON.stringify(userInfo));
+			const wallet = response.publicKey.toString();
+			setWalletAddres(wallet)
+			console.log("Address:", wallet);
 			  setShowSignUpContainer(false);
 			  setShowSignInContainer(false);
 			  setIsSignUpClicked(true);
@@ -131,19 +175,19 @@ const App = () => {
 			</select>
 		<div><button className="cta-button2 connect-wallet-button" onClick={handleConfirm} disabled={!selectedActorType}>Confirm your profile</button>				
 		</div> 
-		
-		<button className="cta-button connect-wallet-button" onClick={connectWallet} disabled={!actorTypeConfirmed}>Connect wallet</button>
+		<button className="cta-button connect-wallet-button"  onClick={connectFirstWallet} disabled={!actorTypeConfirmed}>Connect wallet</button>
 		</div> )
 
 const renderSignInContainer = () => (
 	<div>
-	<button className="cta-button connect-wallet-button" onClick={connectWallet} disabled={!actorTypeConfirmed}>Connect wallet</button>
+	<button className="cta-button connect-wallet-button" onClick={connectWallet} >Connect wallet</button>
 	</div> 
 )
 
 	useEffect(() => {
 		const onLoad = async() => {
 			setIsSignUpClicked(false);
+			setActorTypeConfirmed(false);
 			await checkIfWalletIsConnected()
 		}
 		window.addEventListener('load', onLoad);
