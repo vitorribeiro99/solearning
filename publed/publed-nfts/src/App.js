@@ -21,7 +21,11 @@ const App = () => {
 
 	const [walletAddress, setWalletAddres] = useState(null);
 	const [selectedActorType, setSelectedActorType] = useState(null);
+	const [user, setUser] = useState(null);
+
+	const [userApprove, setUserApprove] = useState(false);
 	const [actorTypeConfirmed, setActorTypeConfirmed] = useState(false);
+	
 	
 	const [showSignUpContainer, setShowSignUpContainer] = useState(false);
 	const [isSignUpClicked, setIsSignUpClicked] = useState(false);
@@ -55,7 +59,7 @@ const App = () => {
 	  };
 
 	const handleConfirm = () => {
-		const userInfa = JSON.parse(localStorage.getItem(`userInfo-AARYw58j8T7ZBSxWD7egje5L1pJo6tVMMrwWuXWafPNr`));
+		const userInfa = JSON.parse(localStorage.getItem(`userInfo-${user}`));
 		if (userInfa.Registed){
 		alert("Already registered");
 		setWalletAddres(null);
@@ -88,20 +92,17 @@ const App = () => {
 		}
 	};
 	const checkIfWalletIsConnected = async () => {
+
 		try {
 			const { solana } = window;
 			if (solana) {
 				if (solana.isPhantom) {
-					// const response = await solana.connect({
-					// 	onlyIfTrusted: true,
-					// });
-					// console.log("Phantom wallet found with the address:",
-					// 	response.publicKey.toString(),
-					// );
-					// setWalletAddres(response.publicKey.toString())
-					// const userwallet = response.publicKey.toString();
-					// const userInfo = JSON.parse(localStorage.getItem(`userInfo-${userwallet}`));
-					// console.log("UserInfo:", userInfo)
+					const response = await solana.connect();
+					console.log("Phantom wallet found with the address:",
+					response.publicKey.toString()
+					);
+					setUser(response.publicKey.toString());
+					setUserApprove(true);
 				}
 				}
 			 else {
@@ -140,7 +141,7 @@ const App = () => {
 				  setIsSignInClicked(true);
 				  
 			}
-		
+
 	};
 
 	const connectWallet = async () => {
@@ -186,6 +187,7 @@ const renderSignInContainer = () => (
 
 	useEffect(() => {
 		const onLoad = async() => {
+			setUser(null);
 			setIsSignUpClicked(false);
 			setActorTypeConfirmed(false);
 			await checkIfWalletIsConnected()
@@ -214,9 +216,9 @@ const renderSignInContainer = () => (
 					<div><hr /></div>
 					<p className="sub-text">Bringing Science from "Web0" to Web3</p>
 						<div>
-							{!walletAddress && !isSignUpClicked && !isSignInClicked && <button className="cta-button" onClick={handleSignUp}>Sign Up</button>}
+							{userApprove && !walletAddress && !isSignUpClicked && !isSignInClicked && <button className="cta-button" onClick={handleSignUp}>Sign Up</button>}
 							{showSignUpContainer && renderSignUpContainer()}
-							{!walletAddress && !isSignUpClicked && !isSignInClicked && <button className="cta-button" onClick={handleSignIn}>Sign In</button>}
+							{userApprove && !walletAddress && !isSignUpClicked && !isSignInClicked && <button className="cta-button" onClick={handleSignIn}>Sign In</button>}
 							{showSignInContainer && renderSignInContainer()}
 						</div>
 				</div>
