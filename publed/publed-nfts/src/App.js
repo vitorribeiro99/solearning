@@ -3,6 +3,7 @@ import "./App.css";
 import twitterLogo from "./assets/twitter-logo.svg";
 import CandyMachine from "./CandyMachine";
 import logo from "./assets/publed_logo-removebg-preview.png";
+import UserProfile from "./User.js";
 
 // Constants
 const TWITTER_HANDLE = "publed_official";
@@ -10,14 +11,8 @@ const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 const ActorTypeOptions = ['Author', 'Organization', 'University', 'Reviewer??'];
 
-const UserProfile = () => {
-	
-	console.log("ola");
-	return (<div></div>);
-
-};
-
 const App = () => {
+	
 
 	const [walletAddress, setWalletAddres] = useState(null);
 	const [selectedActorType, setSelectedActorType] = useState(null);
@@ -35,6 +30,7 @@ const App = () => {
 
 	const [isRegisted, setIsRegisted] = useState(false);
 
+	const [isProfileClicked, setIsProfileClicked] = useState(false);
 
 	useEffect(() => {
 		const actorType = localStorage.getItem("actorType");
@@ -80,6 +76,7 @@ const App = () => {
 	const handleProfile = () => {
 					// const userInfo = JSON.parse(localStorage.getItem(`userInfo-${walletAddress}`));
 					// console.log("UserInfo:", userInfo)
+					setIsProfileClicked(true);
 	}
 
 	const handleLogout = () => {
@@ -155,12 +152,13 @@ const App = () => {
 			const wallet = response.publicKey.toString();
 			setWalletAddres(wallet)
 			console.log("Address:", wallet);
-			  setShowSignUpContainer(false);
-			  setShowSignInContainer(false);
-			  setIsSignUpClicked(true);
-			  setIsSignInClicked(true);
+			setShowSignUpContainer(false);
+			setShowSignInContainer(false);
+			setIsSignUpClicked(true);
+			setIsSignInClicked(true);
 		}
 	};
+
 
 	const renderSignUpContainer = () => (
 		<div>
@@ -179,11 +177,11 @@ const App = () => {
 		<button className="cta-button connect-wallet-button"  onClick={connectFirstWallet} disabled={!actorTypeConfirmed}>Connect wallet</button>
 		</div> )
 
-const renderSignInContainer = () => (
-	<div>
-	<button className="cta-button connect-wallet-button" onClick={connectWallet} >Connect wallet</button>
-	</div> 
-)
+	const renderSignInContainer = () => (
+		<div>
+		<button className="cta-button connect-wallet-button" onClick={connectWallet} >Connect wallet</button>
+		</div> 
+	)
 
 	useEffect(() => {
 		const onLoad = async() => {
@@ -209,6 +207,7 @@ const renderSignInContainer = () => (
 				<div class="navbar-left">
 					{walletAddress && <button className="logout-button" onClick={handleLogout}>Logout</button>}
 					{walletAddress && <button className="logout-button" onClick={handleProfile}>Profile</button>}
+					{isProfileClicked && <UserProfile user={user}/>}
 					
 				</div>
 				</nav>
@@ -222,7 +221,7 @@ const renderSignInContainer = () => (
 							{showSignInContainer && renderSignInContainer()}
 						</div>
 				</div>
-				{walletAddress && <UserProfile/> && (<CandyMachine walletAddress={window.solana} />)}
+				{walletAddress && (<CandyMachine walletAddress={window.solana} />)}
 				<div className="footer-container">
 					<img
 						alt="Twitter Logo"
